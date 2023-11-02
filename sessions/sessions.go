@@ -54,7 +54,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 	sharedSessions := make(map[string]*session.Session) // region/key => session
 	for _, instance := range instances {
 		// re-use session for the same region and key (explicit or empty for implicit) pair
-		if s := sharedSessions[instance.Region+"/"+instance.AWSAccessKey]; s != nil {
+		if s := sharedSessions[instance.Region+"/"+instance.Labels["account_id"]]; s != nil {
 			res.sessions[s] = append(res.sessions[s], Instance{
 				Region:                 instance.Region,
 				Instance:               instance.Instance,
