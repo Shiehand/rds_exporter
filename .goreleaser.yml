@@ -41,5 +41,7 @@ dockers:
   goarch: amd64
   image_templates:
   - "ghcr.io/shiehand/rds_exporter:{{.Major}}.{{.Minor}}"
+  - "ghcr.io/shiehand/rds_exporter:{{.Version}}"
+  - "ghcr.io/shiehand/rds_exporter:latest"
   dockerfile: Dockerfile.releaser
   use: buildx
