@@ -54,6 +54,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 	sharedSessions := make(map[string]*session.Session) // region/key => session
 	for _, instance := range instances {
 		// re-use session for the same region and key (explicit or empty for implicit) pair
+		level.Info(logger).Log("msg", instance.Region+"/"+instance.Labels["account_id"])
 		if s := sharedSessions[instance.Region+"/"+instance.Labels["account_id"]]; s != nil {
 			res.sessions[s] = append(res.sessions[s], Instance{
 				Region:                 instance.Region,
@@ -136,6 +137,15 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 			}
 		}
 	}
+
+	w := tabwriter.NewWriter(os.Stderr, 0, 0, 2, ' ', 0)
+	fmt.Fprintf(w, "Region\tInstance\tResource ID\tInterval\n")
+	for _, instances := range res.sessions {
+		for _, instance := range instances {
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", instance.Region, instance.Instance, instance.ResourceID, instance.EnhancedMonitoringInterval)
+		}
+	}
+	_ = w.Flush()
 
 	// remove instances without resource ID
 	for session, instances := range res.sessions {
