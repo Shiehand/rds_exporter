@@ -100,7 +100,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		if err != nil {
 			return nil, err
 		}
-		sharedSessions[instance.Region+"/"+instance.AWSAccessKey] = s
+		sharedSessions[instance.Region+"/"+instance.Labels["account_id"]] = s
 		res.sessions[s] = append(res.sessions[s], Instance{
 			Region:                 instance.Region,
 			Instance:               instance.Instance,
