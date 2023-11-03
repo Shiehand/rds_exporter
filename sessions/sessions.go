@@ -113,7 +113,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 
 	// add resource ID to all instances
 	for session, instances := range res.sessions {
-		fmt.Fprintf(os.Stderr, "%v", instances)
+		fmt.Fprintf(os.Stderr, "%v\n", instances)
 		svc := rds.New(session)
 		var marker *string
 		for {
@@ -195,6 +195,7 @@ func (s *Sessions) GetSession(region, instance string) (*session.Session, *Insta
 }
 
 func buildCredentials(instance config.Instance) (*credentials.Credentials, error) {
+	fmt.Fprintln(os.Stderr, "Instance: "+instance.String())
 	if instance.AWSRoleArn != "" {
 		if instance.AWSAccessKey != "" || instance.AWSSecretKey != "" {
 			stsSession, err := session.NewSession(&aws.Config{
@@ -206,7 +207,7 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		} else {
-			fmt.Fprintln(os.Stderr, "Instance: "+instance.String())
+			fmt.Fprintln(os.Stderr, "Instance else: "+instance.String())
 			stsSession, err := session.NewSession(&aws.Config{
 				Region: aws.String(instance.Region),
 			})
