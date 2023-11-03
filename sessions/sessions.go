@@ -113,7 +113,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 
 	// add resource ID to all instances
 	for session, instances := range res.sessions {
-		fmt.Printf("%v", instances)
+		fmt.Fprintf(os.Stderr, "%v", instances)
 		svc := rds.New(session)
 		var marker *string
 		for {
@@ -206,7 +206,7 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		} else {
-			fmt.Println("Instance: " + instance.String())
+			fmt.Fprintln(os.Stderr, "Instance: "+instance.String())
 			stsSession, err := session.NewSession(&aws.Config{
 				Region: aws.String(instance.Region),
 			})
