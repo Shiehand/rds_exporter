@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -112,6 +113,8 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 	}
 
 	// add resource ID to all instances
+	js, _ := json.Marshal(res.sessions)
+	fmt.Println(string(js))
 	for session, instances := range res.sessions {
 		svc := rds.New(session)
 		var marker *string
