@@ -204,7 +204,12 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		} else {
-			stsSession := session.Must(session.NewSession())
+			stsSession, err := session.NewSession(&aws.Config{
+				Region: aws.String(instance.Region),
+			})
+			if err != nil {
+				return nil, err
+			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		}
 	}
