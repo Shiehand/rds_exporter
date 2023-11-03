@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -195,7 +196,8 @@ func (s *Sessions) GetSession(region, instance string) (*session.Session, *Insta
 }
 
 func buildCredentials(instance config.Instance) (*credentials.Credentials, error) {
-	fmt.Fprintln(os.Stderr, "Instance: "+instance.String())
+	s, _ := json.MarshalIndent(instance, "", "  ")
+	fmt.Fprintln(os.Stderr, string(s))
 	if instance.AWSRoleArn != "" {
 		if instance.AWSAccessKey != "" || instance.AWSSecretKey != "" {
 			stsSession, err := session.NewSession(&aws.Config{
