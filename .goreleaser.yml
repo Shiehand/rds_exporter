@@ -32,7 +32,7 @@ changelog:
   skip: true
 release:
   github:
-    owner: Shiehand
+    owner: shiehand
     name: rds_exporter
   draft: true
   prerelease: auto
