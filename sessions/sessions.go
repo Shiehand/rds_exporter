@@ -125,6 +125,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 			}
 
 			for _, dbInstance := range output.DBInstances {
+				level.Info(logger).Log("msg", "dbInstance: "+dbInstance.GoString())
 				for i, instance := range instances {
 					if *dbInstance.DBInstanceIdentifier == instance.Instance {
 						instances[i].ResourceID = *dbInstance.DbiResourceId
@@ -204,6 +205,7 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		} else {
+			fmt.Println("Instance: " + instance.String())
 			stsSession, err := session.NewSession(&aws.Config{
 				Region: aws.String(instance.Region),
 			})
