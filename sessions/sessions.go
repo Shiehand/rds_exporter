@@ -167,7 +167,7 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		}
 	}
 
-	w := tabwriter.NewWriter(os.Stderr, 0, 0, 2, ' ', 0)
+	w = tabwriter.NewWriter(os.Stderr, 0, 0, 2, ' ', 0)
 	fmt.Fprintf(w, "Region\tInstance\tResource ID\tInterval\n")
 	for _, instances := range res.sessions {
 		for _, instance := range instances {
