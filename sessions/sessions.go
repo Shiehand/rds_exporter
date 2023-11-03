@@ -55,7 +55,6 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 	sharedSessions := make(map[string]*session.Session) // region/key => session
 	for _, instance := range instances {
 		// re-use session for the same region and key (explicit or empty for implicit) pair
-		level.Info(logger).Log("msg", instance.Region+"/"+instance.Labels["account_id"])
 		if s := sharedSessions[instance.Region+"/"+instance.Labels["account_id"]]; s != nil {
 			res.sessions[s] = append(res.sessions[s], Instance{
 				Region:                 instance.Region,
@@ -114,7 +113,6 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 
 	// add resource ID to all instances
 	for session, instances := range res.sessions {
-		fmt.Fprintf(os.Stderr, "%v\n", instances)
 		svc := rds.New(session)
 		var marker *string
 		for {
@@ -127,7 +125,6 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 			}
 
 			for _, dbInstance := range output.DBInstances {
-				level.Info(logger).Log("msg", "dbInstance: "+dbInstance.GoString())
 				for i, instance := range instances {
 					if *dbInstance.DBInstanceIdentifier == instance.Instance {
 						instances[i].ResourceID = *dbInstance.DbiResourceId
@@ -170,15 +167,6 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		}
 	}
 
-	w = tabwriter.NewWriter(os.Stderr, 0, 0, 2, ' ', 0)
-	fmt.Fprintf(w, "Region\tInstance\tResource ID\tInterval\n")
-	for _, instances := range res.sessions {
-		for _, instance := range instances {
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", instance.Region, instance.Instance, instance.ResourceID, instance.EnhancedMonitoringInterval)
-		}
-	}
-	_ = w.Flush()
-
 	level.Info(logger).Log("msg", fmt.Sprintf("Using %d sessions.", len(res.sessions)))
 	return res, nil
 }
@@ -197,6 +185,7 @@ func (s *Sessions) GetSession(region, instance string) (*session.Session, *Insta
 
 func buildCredentials(instance config.Instance) (*credentials.Credentials, error) {
 	s, _ := json.MarshalIndent(instance, "", "  ")
+	fmt.Fprintln(os.Stderr, "Building Credentials for Instance: ")
 	fmt.Fprintln(os.Stderr, string(s))
 	if instance.AWSRoleArn != "" {
 		if instance.AWSAccessKey != "" || instance.AWSSecretKey != "" {
@@ -209,7 +198,6 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			}
 			return stscreds.NewCredentials(stsSession, instance.AWSRoleArn), nil
 		} else {
-			fmt.Fprintln(os.Stderr, "Instance else: "+instance.String())
 			stsSession, err := session.NewSession(&aws.Config{
 				Region: aws.String(instance.Region),
 			})
